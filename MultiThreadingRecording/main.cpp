@@ -100,5 +100,6 @@ int main(int argc, char** argv)
 		//cv::imshow("desktop", hwnd2mat(hwndDesktop));
 		key = cv::waitKey(60); // you can change wait time
 	}
+	outputVideo.release();
 	return 0;
 }
