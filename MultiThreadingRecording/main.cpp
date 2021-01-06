@@ -4,10 +4,10 @@
 
 int main()
 {
-	SetConsoleCP(1251); // настраиваем кодировку консоли (ввод)
-	SetConsoleOutputCP(1251); // (вывод)
+	SetConsoleCP(1251); // configure console encoding (input)
+	SetConsoleOutputCP(1251); // (output)
 
-	// настраиваем внутренние механизмы на эту кодировку
+	// set up internal mechanisms for this encoding
 	setlocale(LC_ALL, ".1251");
 
 	Application App;

@@ -1,15 +1,15 @@
 #include "Hwnd2Mat.hpp"
 
-//#include <WinUser.h>
-
 Hwnd2Mat::Hwnd2Mat(HWND hwindow, float scale)
 {
 	hwnd = hwindow;
 	hwindowDC = GetDC(hwnd);
 	hwindowCompatibleDC = CreateCompatibleDC(hwindowDC);
 	SetStretchBltMode(hwindowCompatibleDC, COLORONCOLOR);
-	
+
+	RECT windowsize;    // get the height and width of the screen
 	GetClientRect(hwnd, &windowsize);
+	
 	srcheight = windowsize.bottom;
 	srcwidth = windowsize.right;
 	height = (int)(windowsize.bottom * scale);
