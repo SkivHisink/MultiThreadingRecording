@@ -2,6 +2,8 @@
 #include <Windows.h>
 #include <opencv2/core/mat.hpp>
 
+RECT windowsize;    // get the height and width of the screen
+
 class Hwnd2Mat final
 {
 public:

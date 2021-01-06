@@ -1,8 +1,9 @@
-#include "VideoWrite.hpp"
-
 #include <iostream>
+
+#include "VideoWrite.hpp"
 #include "Hwnd2Mat.hpp"
 #include <opencv2/imgproc.hpp>
+#include <opencv2/videoio.hpp>
 
 void VideoWrite::start(const std::string& filename, HWND hwndWindow)
 {
@@ -46,7 +47,13 @@ void VideoWrite::run(std::string filename, HWND hwndWindow)
 	}
 	cv::Mat bgrImg;
 	while (true) {
-		capDesktop.read();
+		try {
+			capDesktop.read();
+		}
+		catch(cv::Exception& e)
+		{
+			std::cout << e.what() << std::endl;
+		}
 		cvtColor(capDesktop.image, bgrImg, cv::COLOR_BGRA2BGR);
 		writer << bgrImg;
 		mtx.lock();

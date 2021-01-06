@@ -2,9 +2,9 @@
 #include "Application.hpp"
 
 #include <iostream>
+
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#include "Hwnd2Mat.hpp"
 
 #define ESC 27
 
@@ -64,7 +64,7 @@ void Application::onButtonCallBack(int event, int x, int y, int flags, void* use
 				auto rect = cv::Rect(0, button.y, cols, buttonWidthSize);
 				ui(rect) = cv::Vec3b(200, 200, 200);
 				if (capture.recording[num]) {
-					putText(ui(button), "Stoped" + capture.ObjNamesCont[num], cv::Point(30, 30), cv::FONT_HERSHEY_COMPLEX, 0.7, cv::Scalar(0, 0, 255));
+					putText(ui(button), "Stopped " + capture.ObjNamesCont[num], cv::Point(30, 30), cv::FONT_HERSHEY_COMPLEX, 0.7, cv::Scalar(0, 0, 255));
 					capture.WriterContainer[num]->stop();
 					capture.recording[num] = false;
 					std::cout << "Capture is stopped " << capture.ObjNamesCont[num] << std::endl;
@@ -82,13 +82,6 @@ void Application::onButtonCallBack(int event, int x, int y, int flags, void* use
 		if (event == cv::EVENT_LBUTTONUP)
 		{
 		}
-	}
-	try {
-		imshow(winName, ui);
-	}
-	catch (cv::Exception& e)
-	{
-		std::cout << e.what() << std::endl;
 	}
 	cv::waitKey(1);
 }
@@ -152,7 +145,7 @@ void Application::start()
 	}
 
 	rows = 60 + buttonWidthSize * number_of_captureObject;
-	ui = cv::Mat3b(rows, cols, cv::Vec3b(0, 255, 0));
+	ui = cv::Mat3b(rows, cols, cv::Vec3b(100, 255, 100));
 	try {
 		putText(ui, "Press ESC to stop capturing", cv::Point(30, 30), cv::FONT_HERSHEY_COMPLEX, 0.7,
 			cv::Scalar(0, 0, 255), 1);

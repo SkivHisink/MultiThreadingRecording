@@ -1,7 +1,7 @@
 #pragma once
 #include <mutex>
 #include <Windows.h>
-#include <opencv2/videoio.hpp>
+
 class VideoWrite
 {
 	bool running = false;

@@ -1,7 +1,8 @@
 #pragma once
-#include <Windows.h>
-#include "VideoWrite.hpp"
+#include <vector>
 
+#include "VideoWrite.hpp"
+#include <opencv2/core/mat.hpp>
 
 struct Capture_Container
 {
@@ -10,6 +11,7 @@ struct Capture_Container
 	std::vector<std::unique_ptr<VideoWrite>> WriterContainer;
 	std::vector<bool> recording;
 };
+
 class Application final
 {
 	int number_of_threads = 0;

@@ -1,9 +1,6 @@
-﻿
-#include <Windows.h>
-#include <iostream>
+﻿#include <clocale>
 
 #include "Application.hpp"
-
 
 int main()
 {
