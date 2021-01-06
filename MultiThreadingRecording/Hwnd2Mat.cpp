@@ -1,4 +1,4 @@
-#include "Hwnd2Mat.h"
+#include "Hwnd2Mat.hpp"
 
 Hwnd2Mat::Hwnd2Mat(HWND hwindow, float scale)
 {

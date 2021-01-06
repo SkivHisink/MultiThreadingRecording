@@ -21,12 +21,21 @@
     <ClCompile Include="Hwnd2Mat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoWrite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Hwnd2Mat.h">
+    <ClInclude Include="VideoWrite.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VideoWrite.hpp">
+    <ClInclude Include="Hwnd2Mat.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

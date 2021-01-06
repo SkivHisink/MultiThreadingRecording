@@ -147,11 +147,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="Hwnd2Mat.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="VideoWrite.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Hwnd2Mat.h" />
+    <ClInclude Include="Application.hpp" />
+    <ClInclude Include="Hwnd2Mat.hpp" />
     <ClInclude Include="VideoWrite.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
