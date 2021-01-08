@@ -154,6 +154,7 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Hwnd2Mat.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MTRException.hpp" />
     <ClCompile Include="VideoWrite.cpp" />
   </ItemGroup>
   <ItemGroup>

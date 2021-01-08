@@ -1,23 +1,24 @@
 #include <iostream>
-
 #include "VideoWrite.hpp"
-#include "Hwnd2Mat.hpp"
-#include <opencv2/imgproc.hpp>
-#include <opencv2/videoio.hpp>
 
-void VideoWrite::start(const std::string& filename, HWND hwndWindow)
+
+void VideoWrite::start(const std::string& filename, std::shared_ptr<Hwnd2Mat> capDesktop, double fps_ = 30.0)
 {
 	if (running)
 	{
 		//std::cout << "It's running wtf man!?\n";
 		return;
 	}
+	if(!setFPS(fps_))
+	{
+		std::cout << "Can't set it FPS. FPS set on 30." << std::endl;
+	}
 	mtx.lock();
 	running = true;
 	mtx.unlock();
-	std::thread([this, filename, &hwndWindow]()
+	std::thread([this, filename, &capDesktop]()
 		{
-			run(filename, hwndWindow);
+			run(filename, capDesktop);
 		}).detach();
 }
 
@@ -28,33 +29,21 @@ void VideoWrite::stop()
 	mtx.unlock();
 }
 
-void VideoWrite::run(std::string filename, HWND hwndWindow)
+void VideoWrite::run(std::string filename, std::shared_ptr<Hwnd2Mat> capDesktop)
 {
-	Hwnd2Mat capDesktop(hwndWindow);
 	cv::VideoWriter writer;
-	int codec = cv::VideoWriter::fourcc('X', 'V', 'I', 'D');
-	double fps = 30.0;
 	if (filename.size() > 50) {
 		filename = filename.substr(0, 15) + filename.substr(filename.size() - 15);
 	}
-	if (!writer.open(filename, codec, fps, capDesktop.image.size(), true)) {
-		std::cout << "Can't create or open file for write" << std::endl;//exception?!
-		return;
-	}
-	if (!writer.isOpened()) {
-		std::cerr << "Could not open the output video file for write" << std::endl;//exception?!
+	if (!writer.open(filename, codec, fps, capDesktop->image.size(), true)) {
+		std::cout << "Can't create or open file " << filename << " for write with this parameters" << std::endl;
+		stop();
 		return;
 	}
 	cv::Mat bgrImg;
 	while (true) {
-		try {
-			capDesktop.read();
-		}
-		catch(cv::Exception& e)
-		{
-			std::cout << e.what() << std::endl;
-		}
-		cvtColor(capDesktop.image, bgrImg, cv::COLOR_BGRA2BGR);
+		capDesktop->read();
+		cvtColor(capDesktop->image, bgrImg, cv::COLOR_BGRA2BGR);
 		writer << bgrImg;
 		mtx.lock();
 		if (!running)

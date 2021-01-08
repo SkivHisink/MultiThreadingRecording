@@ -1,15 +1,21 @@
 #pragma once
+#include <opencv2/imgproc.hpp>
+#include <opencv2/videoio.hpp>
 #include <mutex>
-#include <Windows.h>
+
+#include "Hwnd2Mat.hpp"
 
 class VideoWrite
 {
 	bool running = false;
 	std::mutex mtx;
+	void run(std::string filename, std::shared_ptr<Hwnd2Mat> capDesktop);
+	int codec = cv::VideoWriter::fourcc('X', 'V', 'I', 'D');
+	double fps = 30.0;
 public:
 	// explicit
 	VideoWrite() {}
-	VideoWrite(VideoWrite&&) {}
+	VideoWrite(VideoWrite&&)noexcept {}
 
 	// implicit
 	VideoWrite(const VideoWrite&) = delete;
@@ -21,12 +27,16 @@ public:
 		running = false;
 		mtx.unlock();
 	}
-	
-	void start(const std::string& filename, HWND hwndWindow);
+
+	bool setFPS(double fps_)
+	{
+		if (fps_ > 0.0 && fps_ <= 1000.0) {
+			fps = fps_;
+			return true;
+		}
+		return false;
+	}
+	void start(const std::string& filename, std::shared_ptr<Hwnd2Mat> capDesktop, double fps_);
 
 	void stop();
-
-	void run(std::string filename, HWND hwndWindow);
-	
-	
 };
