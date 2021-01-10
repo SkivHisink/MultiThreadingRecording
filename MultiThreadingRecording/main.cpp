@@ -81,6 +81,7 @@ public:
 	std::vector<int> items;
 	std::vector<std::string> already_recording;
 	std::vector<time_struct> stopwatchCont;
+	std::vector<bool> show_draw;
 	void init(size_t number, std::vector<std::wstring> titles)
 	{
 		for (int i = 0; i < titles.size(); ++i) {
@@ -106,6 +107,7 @@ public:
 		already_recording.assign(number, "");
 		already_captured_dir.assign(number, "");
 		stopwatchCont.assign(number, time_struct());
+		show_draw.assign(number, false);
 	}
 	~Obj()
 	{
@@ -144,6 +146,8 @@ bool find_str_in_strCont(std::string& str, std::vector<std::string>& container)
 }
 int main(int argc, char* argv[])
 {
+	setlocale(LC_ALL, "ru_RU.UTF-8");
+	
 	// Setup window
 	glfwSetErrorCallback(glfw_error_callback);
 	if (!glfwInit())
@@ -209,14 +213,18 @@ int main(int argc, char* argv[])
 		0,
 	};
 	// Setup Dear ImGui context
+	static char kek[67] = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
+	//ImGuiIO keku;
+	//keku.AddInputCharactersUTF8(kek);
+
+	
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	//io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Tahoma.ttf", 14.0f, &font_config, ranges);
+	ImGuiIO& io = ImGui::GetIO();(void)io;
+	io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Times.ttf", 18.0f, /*&font_config*/NULL, /*ranges*/io.Fonts->GetGlyphRangesCyrillic());
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
 	//ImGui::StyleColorsClassic();
-
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
@@ -240,10 +248,9 @@ int main(int argc, char* argv[])
 
 	bool show_another_window = false;
 
-	std::chrono::time_point begin = std::chrono::steady_clock::now();
-	std::chrono::time_point end = begin;
 	std::vector<std::string> alert_massage;
 	alert_massage.assign(number_of_threads, "");
+	
 	// Main loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -307,7 +314,7 @@ int main(int argc, char* argv[])
 						ImGui::TableNextColumn();
 						ImGui::Text("Capture %d", i + 1);
 
-						ImGui::BeginChild((id_child + std::to_string(i)).c_str(), ImVec2(0, 140), true, window_flags);
+						ImGui::BeginChild((id_child + std::to_string(i)).c_str(), ImVec2(0, 170), true, window_flags);
 						{
 							ImGui::Text("Write save directory and/or file name without .avi");
 							ImGui::PushID((id_input + std::to_string(i)).c_str());
@@ -338,7 +345,7 @@ int main(int argc, char* argv[])
 								}
 								else if (capture.recording[i] == recording)
 								{
-									alert_massage[i] = "You already recording "+ capture.already_recording[i];
+									alert_massage[i] = "You already recording " + capture.already_recording[i];
 
 								}
 								else if (capture.recording[i] == pause)
@@ -347,7 +354,7 @@ int main(int argc, char* argv[])
 									capture.stopwatchCont[i].paused_summ += std::chrono::duration_cast<std::chrono::milliseconds>(capture.stopwatchCont[i].paused_end - capture.stopwatchCont[i].paused_begin);
 									capture.WriterContainer[i]->pause();
 									capture.recording[i] = recording;
-									alert_massage[i] = "Continue recording "+capture.already_recording[i];
+									alert_massage[i] = "Continue recording " + capture.already_recording[i];
 								}
 								else if (find_str_in_strCont(tmp, capture.already_captured_dir)) {
 									alert_massage[i] = "Can't record in the directory that already used";
@@ -410,7 +417,14 @@ int main(int argc, char* argv[])
 							{
 								if (capture.recording[i] == recording || capture.recording[i] == pause)
 								{
-									//...
+									if (!capture.show_draw[i])
+									{
+										capture.show_draw[i] = true;
+									}
+									else
+									{
+										capture.show_draw[i] = false;
+									}
 								}
 								else
 								{
@@ -419,6 +433,10 @@ int main(int argc, char* argv[])
 							}
 							capture.stopwatchCont[i].end = std::chrono::steady_clock::now();
 							ImGui::Text(alert_massage[i].c_str());
+						}
+						if((capture.recording[i] == recording || capture.recording[i] == pause)&& capture.show_draw[i])
+						{
+							capture.WriterContainer[i]->draw(capture.already_captured_dir[i]);
 						}
 						ImGui::EndChild();
 					}

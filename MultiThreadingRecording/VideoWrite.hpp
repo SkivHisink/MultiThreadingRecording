@@ -1,5 +1,6 @@
 #pragma once
 #include <atomic>
+#include <glad/glad.h>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/videoio.hpp>
 
@@ -9,7 +10,7 @@ class ImGuiDrawable
 {
 public:
 	virtual ~ImGuiDrawable() = default;
-	virtual void draw() = 0;
+	virtual void draw(std::string& window_name) = 0;
 };
 class VideoWrite final: public ImGuiDrawable
 {
@@ -18,6 +19,8 @@ class VideoWrite final: public ImGuiDrawable
 	void run(std::string filename, std::shared_ptr<Hwnd2Mat> capDesktop);
 	int codec = cv::VideoWriter::fourcc('X', 'V', 'I', 'D');
 	double fps = 30.0;
+	cv::Mat img;
+	GLuint texture;
 public:
 	// explicit
 	 VideoWrite() = default;
@@ -44,11 +47,6 @@ public:
 
 	void stop();
 	void pause();
-public:
-	void draw() override
-	{
-		ImGui::Begin("window");
-		ImGui::Text("AAAAAAAA");
-		ImGui::End();
-	}
+	void draw(std::string& window_name) override;
+	
 };
