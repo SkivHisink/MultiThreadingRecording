@@ -14,13 +14,13 @@ public:
 class VideoWrite final: public ImGuiDrawable
 {
 	std::atomic<bool> running = false;
-
+	std::atomic<bool> paused = false;
 	void run(std::string filename, std::shared_ptr<Hwnd2Mat> capDesktop);
 	int codec = cv::VideoWriter::fourcc('X', 'V', 'I', 'D');
 	double fps = 30.0;
 public:
 	// explicit
-	explicit VideoWrite() = default;
+	 VideoWrite() = default;
 	VideoWrite(VideoWrite&&) noexcept {}
 
 	// implicit
@@ -43,6 +43,7 @@ public:
 	void start(const std::string& filename, std::shared_ptr<Hwnd2Mat> capDesktop, double fps_);
 
 	void stop();
+	void pause();
 public:
 	void draw() override
 	{

@@ -10,28 +10,28 @@
 #define ESC 27
 
 namespace {
-	BOOL CALLBACK getOpenWindowsNames(HWND hwnd, LPARAM lParam) {
-		const DWORD TITLE_SIZE = 1024;
-		WCHAR windowTitle[TITLE_SIZE];
+	//BOOL CALLBACK getOpenWindowsNames(HWND hwnd, LPARAM lParam) {
+	//	const DWORD TITLE_SIZE = 1024;
+	//	WCHAR windowTitle[TITLE_SIZE];
 
-		GetWindowTextW(hwnd, windowTitle, TITLE_SIZE);
+	//	GetWindowTextW(hwnd, windowTitle, TITLE_SIZE);
 
-		int length = GetWindowTextLength(hwnd);
-		std::wstring title(&windowTitle[0]);
-		if (!IsWindowVisible(hwnd) || length == 0 || title == L"Program Manager") {
-			return TRUE;
-		}
+	//	int length = GetWindowTextLength(hwnd);
+	//	std::wstring title(&windowTitle[0]);
+	//	if (!IsWindowVisible(hwnd) || length == 0 || title == L"Program Manager") {
+	//		return TRUE;
+	//	}
 
-		// Retrieve the pointer passed into this callback, and re-'type' it.
-		// The only way for a C API to pass arbitrary data is by means of a void*.
-		std::vector<std::wstring>& titles = *reinterpret_cast<std::vector<std::wstring>*>(lParam);
-		titles.push_back(title);
+	//	// Retrieve the pointer passed into this callback, and re-'type' it.
+	//	// The only way for a C API to pass arbitrary data is by means of a void*.
+	//	std::vector<std::wstring>& titles = *reinterpret_cast<std::vector<std::wstring>*>(lParam);
+	//	titles.push_back(title);
 
-		return TRUE;
-	}
+	//	return TRUE;
+	//}
 
 
-	std::string wideToMultiByte(std::wstring const& wideString)
+	/*std::string wideToMultiByte(std::wstring const& wideString)
 	{
 		std::string ret;
 		std::string buff(MB_CUR_MAX, '\0');
@@ -49,7 +49,7 @@ namespace {
 		}
 
 		return ret;
-	}
+	}*/
 }
 
 void Application::onButtonCallBack(int event, int x, int y, int flags, void* userdata)
@@ -105,34 +105,34 @@ void Application::init()
 		std::cin.ignore(256, '\n');
 		std::cin >> number_of_captureObject;
 	}*/
-	EnumWindows(getOpenWindowsNames, reinterpret_cast<LPARAM>(&titles));
+	//EnumWindows(getOpenWindowsNames, reinterpret_cast<LPARAM>(&titles));
 	GetSystemTime(&st);
 	//capture object init
 	//std::vector<size_t> capturedNumbers;
-	int i = 1;
-	std::cout << "0 Primary monitor" << std::endl;
-	for (const auto& title : titles) {
-		std::wcout << i++ << " " << title << std::endl;
-	}
-	for (int j = 0; j < number_of_captureObject; ++j) {
-		std::cin >> i;
-		while (std::cin.fail() || !(i >= 0 && i < titles.size())) {
-			std::cout << "You write wrong number. Please try again." << std::endl;
-			std::cin.clear();
-			std::cin.ignore(256, '\n');
-			std::cin >> i;
-		}
-		if (i == 0) {
-			capture.hwndCont.push_back(GetDesktopWindow());
-			capture.ObjNamesCont.push_back("Primary monitor");
-			std::cout << "Primary monitor ready to capture" << std::endl;
-		}
-		else {
-			capture.hwndCont.push_back(FindWindow(NULL, titles[i - 1].c_str()));
-			capture.ObjNamesCont.push_back(wideToMultiByte(titles[i - 1]));
-			std::cout << "\"" + capture.ObjNamesCont[j] + "\"" + " ready to capture" << std::endl;
-		}
-	}
+	//int i = 1;
+	//std::cout << "0 Primary monitor" << std::endl;
+	//for (const auto& title : titles) {
+	//	std::wcout << i++ << " " << title << std::endl;
+	//}
+	//for (int j = 0; j < number_of_captureObject; ++j) {
+	//	std::cin >> i;
+	//	while (std::cin.fail() || !(i >= 0 && i < titles.size())) {
+	//		std::cout << "You write wrong number. Please try again." << std::endl;
+	//		std::cin.clear();
+	//		std::cin.ignore(256, '\n');
+	//		std::cin >> i;
+	//	}
+	//	if (i == 0) {
+	//		capture.hwndCont.push_back(GetDesktopWindow());
+	//		capture.ObjNamesCont.push_back("Primary monitor");
+	//		std::cout << "Primary monitor ready to capture" << std::endl;
+	//	}
+	//	else {
+	//		capture.hwndCont.push_back(FindWindow(NULL, titles[i - 1].c_str()));
+	//		capture.ObjNamesCont.push_back(wideToMultiByte(titles[i - 1]));
+	//		std::cout << "\"" + capture.ObjNamesCont[j] + "\"" + " ready to capture" << std::endl;
+	//	}
+	//}
 	//changing fps
 	std::cout << "You can change standart fps. Do you want to change this? Write Yes/No" << std::endl;
 	while (true)
@@ -165,7 +165,7 @@ void Application::init()
 		break;
 	}
 	//new save directory init
-	std::cout << "The standard location for saving video is in the program directory. Do you want to change this? Write Yes/No" << std::endl;
+	/*std::cout << "The standard location for saving video is in the program directory. Do you want to change this? Write Yes/No" << std::endl;
 	while (true)
 	{
 		std::string answer;
@@ -187,9 +187,9 @@ void Application::init()
 		{
 			std::cout << "You write something wrong. Please try again." << std::endl;
 		}
-	}
+	}*/
 	//UI control initialization
-	rows = 60 + buttonWidthSize * number_of_captureObject;
+	/*rows = 60 + buttonWidthSize * number_of_captureObject;
 	ui = cv::Mat3b(rows, cols, cv::Vec3b(100, 255, 100));
 	putText(ui, "Press ESC to stop capturing", cv::Point(30, 30), cv::FONT_HERSHEY_COMPLEX, 0.7, cv::Scalar(0, 0, 255), 1);
 	for (int j = 0; j < number_of_captureObject; ++j) {
@@ -197,7 +197,7 @@ void Application::init()
 		ui(button) = cv::Vec3b(200, 200, 200);
 		putText(ui(button), "Recording " + capture.ObjNamesCont[j], cv::Point(30, 30), cv::FONT_HERSHEY_COMPLEX, 0.7, cv::Scalar(0, 0, 0));
 		buttonContainer.push_back(button);
-	}
+	}*/
 }
 
 void Application::start()

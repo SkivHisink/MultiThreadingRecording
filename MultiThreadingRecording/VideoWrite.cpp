@@ -26,6 +26,17 @@ void VideoWrite::stop()
 {
 	running = false;
 }
+void VideoWrite::pause()
+{
+	if(paused)
+	{
+		paused = false;
+	}
+	else
+	{
+		paused = true;
+	}
+}
 
 void VideoWrite::run(std::string filename, std::shared_ptr<Hwnd2Mat> capDesktop)
 {
@@ -40,10 +51,11 @@ void VideoWrite::run(std::string filename, std::shared_ptr<Hwnd2Mat> capDesktop)
 	}
 	cv::Mat bgrImg;
 	while (running) {
-		capDesktop->read();
-		cvtColor(capDesktop->image, bgrImg, cv::COLOR_BGRA2BGR);
-		writer << bgrImg;
-
+		if (!paused) {
+			capDesktop->read();
+			cvtColor(capDesktop->image, bgrImg, cv::COLOR_BGRA2BGR);
+			writer << bgrImg;
+		}
 		if (!running)
 		{
 			running = false;
