@@ -169,6 +169,21 @@ struct Obj
 	}
 };
 
+static auto vector_getter = [](void* vec, int idx, const char** out_text)
+{
+	auto& vector = *static_cast<std::vector<std::string>*>(vec);
+	if (idx < 0 || idx >= static_cast<int>(vector.size())) { return false; }
+	*out_text = vector.at(idx).c_str();
+	return true;
+};
+
+bool Combo(const char* label, int* currIndex, std::vector<std::string>& values)
+{
+	if (values.empty()) { return false; }
+	return ImGui::Combo(label, currIndex, vector_getter,
+		static_cast<void*>(&values), values.size());
+}
+
 int main(int argc, char* argv[])
 {
 	// Setup window
@@ -224,11 +239,22 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
+	ImFontConfig font_config;
+	font_config.OversampleH = 1; //or 2 is the same
+	font_config.OversampleV = 1;
+	font_config.PixelSnapH = 1;
+
+	static const ImWchar ranges[] =
+	{
+		0x0020, 0x00FF, // Basic Latin + Latin Supplement
+		0x0400, 0x044F, // Cyrillic
+		0,
+	};
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-
+	//io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Tahoma.ttf", 14.0f, &font_config, ranges);
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
 	//ImGui::StyleColorsClassic();
@@ -237,6 +263,7 @@ int main(int argc, char* argv[])
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
+	
 	// Our state
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -252,10 +279,12 @@ int main(int argc, char* argv[])
 	std::string window_names="Primary monitor";
 	window_names += '\0';
 	int number_of_names = 0;
+	std::vector<std::string> wn;
 	for(auto title:titles)
 	{
 		window_names += wideToMultiByte(title)+"\0";
 		++number_of_names;
+		wn.push_back(wideToMultiByte(title));
 	}
 	
 	// Main loop
@@ -323,7 +352,8 @@ int main(int argc, char* argv[])
 						ImGui::Text("Choose window for Capture");
 						const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD" };
 						static int item = -1;
-						ImGui::Combo("", &item, window_names.c_str(), number_of_names);
+						//ImGui::Combo("", &item, window_names.c_str(), number_of_names);
+						Combo("", &item, wn);
 						ImGui::Button("Start");
 						ImGui::SameLine(); ImGui::Button("Pause");
 						ImGui::SameLine(); ImGui::Button("Stop");
