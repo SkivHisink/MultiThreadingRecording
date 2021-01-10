@@ -7,7 +7,6 @@
 #include <opencv2/highgui.hpp>
 
 #include "Hwnd2Mat.hpp"
-
 #define ESC 27
 
 namespace {

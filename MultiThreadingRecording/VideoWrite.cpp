@@ -9,13 +9,13 @@ void VideoWrite::start(const std::string& filename, std::shared_ptr<Hwnd2Mat> ca
 		//std::cout << "It's running wtf man!?\n";
 		return;
 	}
-	if(!setFPS(fps_))
+	if (!setFPS(fps_))
 	{
 		std::cout << "Can't set it FPS. FPS set on 30." << std::endl;
 	}
-	mtx.lock();
+
 	running = true;
-	mtx.unlock();
+
 	std::thread([this, filename, &capDesktop]()
 		{
 			run(filename, capDesktop);
@@ -24,9 +24,7 @@ void VideoWrite::start(const std::string& filename, std::shared_ptr<Hwnd2Mat> ca
 
 void VideoWrite::stop()
 {
-	mtx.lock();
 	running = false;
-	mtx.unlock();
 }
 
 void VideoWrite::run(std::string filename, std::shared_ptr<Hwnd2Mat> capDesktop)
@@ -41,17 +39,15 @@ void VideoWrite::run(std::string filename, std::shared_ptr<Hwnd2Mat> capDesktop)
 		return;
 	}
 	cv::Mat bgrImg;
-	while (true) {
+	while (running) {
 		capDesktop->read();
 		cvtColor(capDesktop->image, bgrImg, cv::COLOR_BGRA2BGR);
 		writer << bgrImg;
-		mtx.lock();
+
 		if (!running)
 		{
 			running = false;
-			mtx.unlock();
 			break;
 		}
-		mtx.unlock();
 	}
 }

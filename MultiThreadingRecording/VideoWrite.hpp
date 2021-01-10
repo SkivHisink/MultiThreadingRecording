@@ -1,21 +1,27 @@
 #pragma once
+#include <atomic>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/videoio.hpp>
-#include <mutex>
 
 #include "Hwnd2Mat.hpp"
-
-class VideoWrite
+#include "imgui/imgui.h"
+class ImGuiDrawable
 {
-	bool running = false;
-	std::mutex mtx;
+public:
+	virtual ~ImGuiDrawable() = default;
+	virtual void draw() = 0;
+};
+class VideoWrite final: public ImGuiDrawable
+{
+	std::atomic<bool> running = false;
+
 	void run(std::string filename, std::shared_ptr<Hwnd2Mat> capDesktop);
 	int codec = cv::VideoWriter::fourcc('X', 'V', 'I', 'D');
 	double fps = 30.0;
 public:
 	// explicit
-	VideoWrite() {}
-	VideoWrite(VideoWrite&&)noexcept {}
+	explicit VideoWrite() = default;
+	VideoWrite(VideoWrite&&) noexcept {}
 
 	// implicit
 	VideoWrite(const VideoWrite&) = delete;
@@ -23,9 +29,7 @@ public:
 
 	~VideoWrite()
 	{
-		mtx.lock();
 		running = false;
-		mtx.unlock();
 	}
 
 	bool setFPS(double fps_)
@@ -39,4 +43,11 @@ public:
 	void start(const std::string& filename, std::shared_ptr<Hwnd2Mat> capDesktop, double fps_);
 
 	void stop();
+public:
+	void draw() override
+	{
+		ImGui::Begin("window");
+		ImGui::Text("AAAAAAAA");
+		ImGui::End();
+	}
 };
