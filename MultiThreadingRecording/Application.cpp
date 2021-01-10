@@ -89,7 +89,7 @@ void Application::onButtonCallBack(int event, int x, int y, int flags, void* use
 
 void Application::init()
 {
-	size_t number_of_threads = std::thread::hardware_concurrency();
+	/*size_t number_of_threads = std::thread::hardware_concurrency();
 	if (number_of_threads == 0) {
 		std::cout << "Unable to properly define or calculate the number of threads on your device. The number of threads that you can use, set to 2." << std::endl;
 		number_of_threads = 2;
@@ -104,7 +104,7 @@ void Application::init()
 		std::cin.clear();
 		std::cin.ignore(256, '\n');
 		std::cin >> number_of_captureObject;
-	}
+	}*/
 	EnumWindows(getOpenWindowsNames, reinterpret_cast<LPARAM>(&titles));
 	GetSystemTime(&st);
 	//capture object init
