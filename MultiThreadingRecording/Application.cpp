@@ -1,229 +1,358 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "Application.hpp"
-
+//std
 #include <iostream>
-
-#include <opencv2/imgproc.hpp>
+//ImGui components
+#include <GLFW/glfw3.h>
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+//OpenCV
 #include <opencv2/highgui.hpp>
 
 #include "Hwnd2Mat.hpp"
-#define ESC 27
-
-namespace {
-	//BOOL CALLBACK getOpenWindowsNames(HWND hwnd, LPARAM lParam) {
-	//	const DWORD TITLE_SIZE = 1024;
-	//	WCHAR windowTitle[TITLE_SIZE];
-
-	//	GetWindowTextW(hwnd, windowTitle, TITLE_SIZE);
-
-	//	int length = GetWindowTextLength(hwnd);
-	//	std::wstring title(&windowTitle[0]);
-	//	if (!IsWindowVisible(hwnd) || length == 0 || title == L"Program Manager") {
-	//		return TRUE;
-	//	}
-
-	//	// Retrieve the pointer passed into this callback, and re-'type' it.
-	//	// The only way for a C API to pass arbitrary data is by means of a void*.
-	//	std::vector<std::wstring>& titles = *reinterpret_cast<std::vector<std::wstring>*>(lParam);
-	//	titles.push_back(title);
-
-	//	return TRUE;
-	//}
 
 
-	/*std::string wideToMultiByte(std::wstring const& wideString)
+
+std::string wideToMultiByte(std::wstring const& wideString)
+{
+	std::string ret;
+	std::string buff(MB_CUR_MAX, '\0');
+
+	for (wchar_t const& wc : wideString)
 	{
-		std::string ret;
-		std::string buff(MB_CUR_MAX, '\0');
+		int mbCharLen = std::wctomb(&buff[0], wc);
 
-		for (wchar_t const& wc : wideString)
+		if (mbCharLen < 1) { break; }
+
+		for (int i = 0; i < mbCharLen; ++i)
 		{
-			int mbCharLen = std::wctomb(&buff[0], wc);
-
-			if (mbCharLen < 1) { break; }
-
-			for (int i = 0; i < mbCharLen; ++i)
-			{
-				ret += buff[i];
-			}
+			ret += buff[i];
 		}
+	}
 
-		return ret;
-	}*/
+	return ret;
 }
 
-void Application::onButtonCallBack(int event, int x, int y, int flags, void* userdata)
-{
-	int capture_ = 0;
-	for (auto button : buttonContainer) {
+BOOL CALLBACK getOpenWindowsNames(HWND hwnd, LPARAM lParam) {
+	const DWORD TITLE_SIZE = 1024;
+	WCHAR windowTitle[TITLE_SIZE];
 
-		if (event == cv::EVENT_LBUTTONDOWN)
-		{
-			if (button.contains(cv::Point(x, y)))
-			{
-				int num = (button.y - 60) / buttonWidthSize;
-				auto rect = cv::Rect(0, button.y, cols, buttonWidthSize);
-				ui(rect) = cv::Vec3b(200, 200, 200);
-				if (capture.recording[num]) {
-					putText(ui(button), "Stopped " + capture.ObjNamesCont[num], cv::Point(30, 30), cv::FONT_HERSHEY_COMPLEX, 0.7, cv::Scalar(0, 0, 255));
-					capture.WriterContainer[num]->stop();
-					capture.recording[num] = false;
-					std::cout << "Capture is stopped " << capture.ObjNamesCont[num] << std::endl;
-				}
-				else
-				{
-					putText(ui(button), "Recording " + capture.ObjNamesCont[num], cv::Point(30, 30), cv::FONT_HERSHEY_COMPLEX, 0.7, cv::Scalar(0, 0, 0));
-					capture.WriterContainer[num]->start(std::to_string(st.wHour) + "_" + std::to_string(st.wMinute) + " " +
-						std::to_string(st.wDay) + " " + std::to_string(st.wMonth) + " " + std::to_string(st.wYear) + " " + capture.ObjNamesCont[num] + std::to_string(num) + ".avi", capture.hwnd2MatCont[num], fps);
-					capture.recording[num] = true;
-					std::cout << "Capture is started " << capture.ObjNamesCont[num] << std::endl;
-				}
-			}
-		}
-		if (event == cv::EVENT_LBUTTONUP)
-		{
-		}
+	GetWindowTextW(hwnd, windowTitle, TITLE_SIZE);
+
+	int length = GetWindowTextLength(hwnd);
+	std::wstring title(&windowTitle[0]);
+	if (!IsWindowVisible(hwnd) || length == 0 || title == L"Program Manager") {
+		return TRUE;
 	}
-	cv::waitKey(1);
+
+	// Retrieve the pointer passed into this callback, and re-'type' it.
+	// The only way for a C API to pass arbitrary data is by means of a void*.
+	std::vector<std::wstring>& titles = *reinterpret_cast<std::vector<std::wstring>*>(lParam);
+	titles.push_back(title);
+
+	return TRUE;
 }
 
-void Application::init()
+bool find_str_in_strCont(std::string& str, std::vector<std::string>& container)
 {
-	/*size_t number_of_threads = std::thread::hardware_concurrency();
-	if (number_of_threads == 0) {
-		std::cout << "Unable to properly define or calculate the number of threads on your device. The number of threads that you can use, set to 2." << std::endl;
-		number_of_threads = 2;
+	for (auto str2 : container)
+	{
+		if (str == str2)
+		{
+			return true;
+		}
 	}
-	std::cout << "You can write no more then " << number_of_threads << std::endl;
-	std::cout << "Write how much windows/desktops you want to capture? ";
-	std::cin >> number_of_captureObject;
-	while (std::cin.fail() || !(number_of_captureObject > 0 && number_of_captureObject <= number_of_threads))
-	{
-		std::cout << "You write something wrong. Please try again" << std::endl;
-		std::cout << "Write how much windows/desktops you want to capture? ";
-		std::cin.clear();
-		std::cin.ignore(256, '\n');
-		std::cin >> number_of_captureObject;
-	}*/
-	//EnumWindows(getOpenWindowsNames, reinterpret_cast<LPARAM>(&titles));
-	GetSystemTime(&st);
-	//capture object init
-	//std::vector<size_t> capturedNumbers;
-	//int i = 1;
-	//std::cout << "0 Primary monitor" << std::endl;
-	//for (const auto& title : titles) {
-	//	std::wcout << i++ << " " << title << std::endl;
-	//}
-	//for (int j = 0; j < number_of_captureObject; ++j) {
-	//	std::cin >> i;
-	//	while (std::cin.fail() || !(i >= 0 && i < titles.size())) {
-	//		std::cout << "You write wrong number. Please try again." << std::endl;
-	//		std::cin.clear();
-	//		std::cin.ignore(256, '\n');
-	//		std::cin >> i;
-	//	}
-	//	if (i == 0) {
-	//		capture.hwndCont.push_back(GetDesktopWindow());
-	//		capture.ObjNamesCont.push_back("Primary monitor");
-	//		std::cout << "Primary monitor ready to capture" << std::endl;
-	//	}
-	//	else {
-	//		capture.hwndCont.push_back(FindWindow(NULL, titles[i - 1].c_str()));
-	//		capture.ObjNamesCont.push_back(wideToMultiByte(titles[i - 1]));
-	//		std::cout << "\"" + capture.ObjNamesCont[j] + "\"" + " ready to capture" << std::endl;
-	//	}
-	//}
-	//changing fps
-	std::cout << "You can change standart fps. Do you want to change this? Write Yes/No" << std::endl;
-	while (true)
-	{
-		std::string answer;
-		std::cin >> answer;
-		if (answer == "Yes")
-		{
-			while (true)
-			{
-				double new_fps;
-				std::cout << "Write new fps:";
-				std::cin >> new_fps;
-				if (!std::cin.fail() && new_fps > 0.0 && new_fps <= 1000.0)
-				{
-					fps = new_fps;
-					break;
-				}
-				std::cout << "You write something wrong. Please try again." << std::endl;
-			}
-		}
-		else if (answer == "No") {
-			break;
-		}
-		else
-		{
-			std::cout << "You write something wrong. Please try again." << std::endl;
-			continue;
-		}
-		break;
+	return false;
+}
+
+static auto vector_getter = [](void* vec, int idx, const char** out_text)
+{
+	auto& vector = *static_cast<std::vector<std::string>*>(vec);
+	if (idx < 0 || idx >= static_cast<int>(vector.size())) { return false; }
+	*out_text = vector.at(idx).c_str();
+	return true;
+};
+
+bool Combo(const char* label, int* currIndex, std::vector<std::string>& values)
+{
+	if (values.empty()) { return false; }
+	return ImGui::Combo(label, currIndex, vector_getter,
+		static_cast<void*>(&values), values.size());
+}
+
+bool Application::init()
+{
+	// Setup window
+	glfwSetErrorCallback(glfw_error_callback);
+	if (!glfwInit()) { return false; }
+	// Decide GL+GLSL versions
+#ifdef __APPLE__
+	// GL 3.2 + GLSL 150
+	const char* glsl_version = "#version 150";
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
+#else
+	// GL 3.0 + GLSL 130
+	const char* glsl_version = "#version 130";
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
+#endif
+
+	// Create window with graphics context
+	window = glfwCreateWindow(1280, 720, "MultiThreading VideoCapture", NULL, NULL);
+	if (window == NULL) { return false; }
+	glfwMakeContextCurrent(window);
+	glfwSwapInterval(1); // Enable vsync
+
+	// Initialize OpenGL loader
+#if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
+	bool err = gl3wInit() != 0;
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
+	bool err = glewInit() != GLEW_OK;
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
+	bool err = gladLoadGL() == 0;
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD2)
+	bool err = gladLoadGL(glfwGetProcAddress) == 0; // glad2 recommend using the windowing library loader instead of the (optionally) bundled one.
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLBINDING2)
+	bool err = false;
+	glbinding::Binding::initialize();
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLBINDING3)
+	bool err = false;
+	glbinding::initialize([](const char* name) { return (glbinding::ProcAddress)glfwGetProcAddress(name); });
+#else
+	bool err = false; // If you use IMGUI_IMPL_OPENGL_LOADER_CUSTOM, your loader is likely to requires some form of initialization.
+#endif
+	if (err) {
+		fprintf(stderr, "Failed to initialize OpenGL loader!\n");
+		return false;
 	}
-	//new save directory init
-	/*std::cout << "The standard location for saving video is in the program directory. Do you want to change this? Write Yes/No" << std::endl;
-	while (true)
-	{
-		std::string answer;
-		std::cin >> answer;
-		if (answer == "Yes")
-		{
-			std::cout << "Write new save place.!WARNING! If you write wrong way to directory or with errors that program can't protect you from it. If you want prevent that please write Yes instead directory";
-			std::cin >> answer;
-			if (answer == "Yes")
-			{
-				break;
-			}
-			directory = answer;
-		}
-		else if (answer == "No") {
-			break;
-		}
-		else
-		{
-			std::cout << "You write something wrong. Please try again." << std::endl;
-		}
-	}*/
-	//UI control initialization
-	/*rows = 60 + buttonWidthSize * number_of_captureObject;
-	ui = cv::Mat3b(rows, cols, cv::Vec3b(100, 255, 100));
-	putText(ui, "Press ESC to stop capturing", cv::Point(30, 30), cv::FONT_HERSHEY_COMPLEX, 0.7, cv::Scalar(0, 0, 255), 1);
-	for (int j = 0; j < number_of_captureObject; ++j) {
-		auto button = cv::Rect(0, 60 + buttonWidthSize * j, cols, buttonWidthSize);
-		ui(button) = cv::Vec3b(200, 200, 200);
-		putText(ui(button), "Recording " + capture.ObjNamesCont[j], cv::Point(30, 30), cv::FONT_HERSHEY_COMPLEX, 0.7, cv::Scalar(0, 0, 0));
-		buttonContainer.push_back(button);
-	}*/
+
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Times.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesCyrillic());
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
+	//ImGui::StyleColorsClassic();
+	// Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init(glsl_version);
+
+
+	// Our state
+	clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+	//Getting info about threads
+	number_of_threads = std::thread::hardware_concurrency();
+	if (number_of_threads == 0) { number_of_threads = 2; }
+	//Getting open windows 
+	EnumWindows(getOpenWindowsNames, reinterpret_cast<LPARAM>(&titles));
+	// Initialization all objects for capturing
+	capture.init(number_of_threads, titles);
+	return true;
 }
 
 void Application::start()
 {
-	//starting capturing and video writing for each object
-	for (int k = 0; k < number_of_captureObject; ++k) {
-		capture.WriterContainer.push_back(std::make_unique<VideoWrite>());
-		capture.hwnd2MatCont.push_back(std::make_shared<Hwnd2Mat>(capture.hwndCont[k]));
-		capture.WriterContainer[k]->start(directory + std::to_string(st.wHour) + "_" + std::to_string(st.wMinute) + " " +
-			std::to_string(st.wDay) + " " + std::to_string(st.wMonth) + " " + std::to_string(st.wYear) + " " + capture.ObjNamesCont[k] + std::to_string(k) + ".avi", capture.hwnd2MatCont[k], fps);
-		capture.recording.push_back(true);
+	bool show_another_window = false;
+
+	std::vector<std::string> alert_massage;
+	alert_massage.assign(number_of_threads, "");
+
+	// Main loop
+	while (!glfwWindowShouldClose(window)) {
+		glfwPollEvents();
+
+		// Start the Dear ImGui frame
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		//Main window
+		{
+			ImGui::Begin("Capture Control Menu");
+			if (ImGui::Button("Start")) {
+				show_another_window = true;
+			}
+			if (ImGui::Button("Exit")) {
+				break;
+			}
+			ImGui::End();
+		}
+		//Second window
+		if (show_another_window) {
+
+			ImGui::Begin("Capture Control");
+
+			static int foo = 1;
+
+			if (number_of_threads == 2) {
+				ImGui::Text("Unable to properly define or calculate the number of threads on your device. The number of threads that you can use, set to 2.");
+
+			}
+			else {
+				ImGui::Text("Choose how much windows you want to capture. You can capture no more than %zu.", number_of_threads);
+
+
+				ImGui::InputInt("Number of threads", &foo, 1, 0);
+				if (foo > number_of_threads || foo <= 0) {
+					foo = 1;
+				}
+			}
+			ImGui::Text("Choose %d progs, which you want to capture", foo);
+
+			// Child
+			{
+				ImGuiWindowFlags window_flags = ImGuiWindowFlags_None;
+
+				ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
+				ImGui::BeginChild("ChildR", ImVec2(0, 400), true, window_flags);
+				if (ImGui::BeginTable("split", 1, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings)) {
+					for (int i = 0; i < foo; ++i) {
+						std::string id_child = "ChildRCh";
+						std::string id_combo = "Combo";
+						std::string id_input = "Input";
+
+						ImGui::TableNextColumn();
+						ImGui::Text("Capture %d", i + 1);
+
+						ImGui::BeginChild((id_child + std::to_string(i)).c_str(), ImVec2(0, 170), true, window_flags);
+						{
+							ImGui::Text("Write save directory and/or file name without .avi");
+							ImGui::PushID((id_input + std::to_string(i)).c_str());
+							ImGui::InputText("", capture.save_dir_char_ptr[i], 255);
+							ImGui::PopID();
+							ImGui::Text("Choose window for Capture");
+							ImGui::PushID((id_combo + std::to_string(i)).c_str());
+							Combo("", &capture.items[i], capture.ObjNamesCont);
+							ImGui::PopID();
+							ImGui::SameLine();
+							capture.stopwatchCont[i].elapsed_ms = (capture.recording[i] != recording) ? capture.stopwatchCont[i].elapsed_ms :
+								std::chrono::duration_cast<std::chrono::milliseconds>(capture.stopwatchCont[i].end - capture.stopwatchCont[i].begin) - capture.stopwatchCont[i].paused_summ;
+							ImGui::Text("%lld:%lld:%lld:%lld",
+								capture.stopwatchCont[i].elapsed_ms.count() / 1000 / 60 / 60,
+								capture.stopwatchCont[i].elapsed_ms.count() / 1000 / 60 % 60,
+								capture.stopwatchCont[i].elapsed_ms.count() / 1000 % 60,
+								capture.stopwatchCont[i].elapsed_ms.count() % 1000);
+							if (ImGui::Button("Start")) {
+								auto tmp = std::string(capture.save_dir_char_ptr[i]);
+								if (capture.items[i] == -1) {
+									alert_massage[i] = "You didn't Choose any window for capture";
+								}
+								else if (strlen(capture.save_dir_char_ptr[i]) == 0) {
+									alert_massage[i] = "You didn't write name of save file";
+								}
+								else if (capture.recording[i] == recording) {
+									alert_massage[i] = "You already recording " + capture.already_recording[i];
+
+								}
+								else if (capture.recording[i] == pause) {
+									capture.stopwatchCont[i].paused_end = std::chrono::steady_clock::now();
+									capture.stopwatchCont[i].paused_summ += std::chrono::duration_cast<std::chrono::milliseconds>(capture.stopwatchCont[i].paused_end - capture.stopwatchCont[i].paused_begin);
+									capture.WriterContainer[i]->pause();
+									capture.recording[i] = recording;
+									alert_massage[i] = "Continue recording " + capture.already_recording[i];
+								}
+								else if (find_str_in_strCont(tmp, capture.already_captured_dir)) {
+									alert_massage[i] = "Can't record in the directory that already used";
+								}
+								else if (!find_str_in_strCont(capture.ObjNamesCont[capture.items[i]], capture.already_recording)) {
+									capture.stopwatchCont[i].begin = capture.stopwatchCont[i].end = std::chrono::steady_clock::now();
+									capture.hwnd2MatCont[i] = std::make_shared<Hwnd2Mat>(capture.hwndCont[capture.items[i]]);
+									capture.already_captured_dir[i] = std::string(capture.save_dir_char_ptr[i]);
+									capture.WriterContainer[i]->start(capture.already_captured_dir[i] + ".avi", capture.hwnd2MatCont[i], fps);
+									capture.recording[i] = recording;
+									alert_massage[i] = "Recording in progress";
+									capture.already_recording[i] = capture.ObjNamesCont[capture.items[i]];
+								}
+								else {
+									alert_massage[i] = "This window is already captured!";
+								}
+							}
+							ImGui::SameLine();
+							if (ImGui::Button("Pause")) {
+								if (capture.recording[i] == recording) {
+									capture.WriterContainer[i]->pause();
+									capture.stopwatchCont[i].paused_begin = std::chrono::steady_clock::now();
+									capture.recording[i] = pause;
+									alert_massage[i] = "Paused";
+								}
+								else if (capture.recording[i] == pause) {
+									capture.stopwatchCont[i].paused_end = std::chrono::steady_clock::now();
+									capture.stopwatchCont[i].paused_summ += std::chrono::duration_cast<std::chrono::milliseconds>(capture.stopwatchCont[i].paused_end - capture.stopwatchCont[i].paused_begin);
+									capture.WriterContainer[i]->pause();
+									capture.recording[i] = recording;
+									alert_massage[i] = "Continue recording " + capture.already_recording[i];
+								}
+								else {
+									alert_massage[i] = "Can't pause because you don't capture";
+								}
+							}
+							ImGui::SameLine();
+							if (ImGui::Button("Stop")) {
+								if (capture.recording[i] == recording || capture.recording[i] == pause) {
+									capture.WriterContainer[i]->stop();
+									capture.recording[i] = stop;
+									capture.already_recording[i] = "";
+									capture.already_captured_dir[i] = "";
+									capture.stopwatchCont[i].paused_summ = std::chrono::duration_cast<std::chrono::milliseconds>(capture.stopwatchCont[i].paused_begin - capture.stopwatchCont[i].paused_begin);;
+									alert_massage[i] = "Stoped";
+								}
+								else {
+									alert_massage[i] = "Can't stop because you don't capture";
+								}
+							}
+							ImGui::SameLine();
+							if (ImGui::Button("Show")) {
+								if (capture.recording[i] == recording || capture.recording[i] == pause) {
+									if (!capture.show_draw[i]) {
+										capture.show_draw[i] = true;
+									}
+									else {
+										capture.show_draw[i] = false;
+									}
+								}
+								else {
+									alert_massage[i] = "Can't show because you don't capture";
+								}
+							}
+							capture.stopwatchCont[i].end = std::chrono::steady_clock::now();
+							ImGui::Text(alert_massage[i].c_str());
+						}
+						if ((capture.recording[i] == recording || capture.recording[i] == pause) && capture.show_draw[i]) {
+							capture.WriterContainer[i]->draw(capture.already_captured_dir[i]);
+						}
+						ImGui::EndChild();
+					}
+					ImGui::EndTable();
+				}
+				ImGui::EndChild();
+				ImGui::PopStyleVar();
+			}
+
+			ImGui::End();
+		}
+
+		// Rendering
+		ImGui::Render();
+		int display_w, display_h;
+		glfwGetFramebufferSize(window, &display_w, &display_h);
+		glViewport(0, 0, display_w, display_h);
+		glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+		glClear(GL_COLOR_BUFFER_BIT);
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		glfwSwapBuffers(window);
 	}
 
-	while (true) {
-		cv::setMouseCallback(winName, s_onButtonCallBack, this);
-		imshow(winName, ui);
-		int key = cv::waitKey(5);
-		for (auto button : buttonContainer) {
-			int num = (button.y - 60) / buttonWidthSize;
-			if (key == num) {
-				std::cout << num << " capture is stopped" << std::endl;
-				capture.WriterContainer[num]->stop();
-			}
-		}
-		if (key == ESC) {
-			break;
-		}
-	}
+	// Cleanup
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
+	glfwDestroyWindow(window);
+	glfwTerminate();
 }

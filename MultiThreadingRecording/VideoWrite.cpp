@@ -1,14 +1,7 @@
 #include <iostream>
 #include "VideoWrite.hpp"
 
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
-
+#include "imgui/imgui.h"
 
 void VideoWrite::start(const std::string& filename, std::shared_ptr<Hwnd2Mat> capDesktop, double fps_ = 30.0)
 {
