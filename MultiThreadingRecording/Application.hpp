@@ -62,6 +62,12 @@ class Application final
 	std::vector<std::string> already_recording;
 	std::vector<time_struct> stopwatchCont;
 	std::vector<bool> show_draw;
+
+	void startButton(std::string& alert_massage, int i);
+	void stopButton(std::vector<std::string>& alert_massage, int i);
+	void pauseButton(std::vector<std::string>& alert_massage, int i);
+	void showButton(std::vector<std::string>& alert_massage, int i);
+	void captureWindow(std::vector<std::string>& alert_massage, int i);
 public:
 	bool init();
 	void start();
@@ -73,4 +79,5 @@ public:
 			delete[] ptr;
 		}
 	}
+	
 };

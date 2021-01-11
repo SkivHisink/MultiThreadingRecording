@@ -151,7 +151,13 @@ bool Application::init()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Times.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesCyrillic());
+	try {
+		io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Times.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesCyrillic());
+	}
+	catch (std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
 	//ImGui::StyleColorsClassic();
@@ -265,80 +271,85 @@ void Application::start()
 								stopwatchCont[i].elapsed_ms.count() / 1000 / 60 % 60,
 								stopwatchCont[i].elapsed_ms.count() / 1000 % 60,
 								stopwatchCont[i].elapsed_ms.count() % 1000);
-							if (ImGui::Button("Start")) {
-								auto tmp = std::string(save_dir_char_ptr[i]);
-								if (items[i] == -1) {
-									alert_massage[i] = "You didn't Choose any window for capture";
-								}
-								else if (strlen(save_dir_char_ptr[i]) == 0) {
-									alert_massage[i] = "You didn't write name of save file";
-								}
-								else if (recording[i] == record) {
-									alert_massage[i] = "You already recording " + already_recording[i];
 
-								}
-								else if (recording[i] == pause) {
-									stopwatchCont[i].paused_end = std::chrono::steady_clock::now();
-									stopwatchCont[i].paused_summ += std::chrono::duration_cast<std::chrono::milliseconds>(stopwatchCont[i].paused_end - stopwatchCont[i].paused_begin);
-									capture.WriterContainer[i]->pause();
-									recording[i] = record;
-									alert_massage[i] = "Continue recording " + already_recording[i];
-								}
-								else if (find_str_in_strCont(tmp, already_captured_dir)) {
-									alert_massage[i] = "Can't record in the directory that already used";
-								}
-								else if (!find_str_in_strCont(capture.ObjNamesCont[items[i]], already_recording)) {
-									stopwatchCont[i].begin = stopwatchCont[i].end = std::chrono::steady_clock::now();
-									already_captured_dir[i] = std::string(save_dir_char_ptr[i]);
-									recording[i] = record;
-									alert_massage[i] = "Recording in progress";
-									already_recording[i] = capture.ObjNamesCont[items[i]];
-									//Start Capturing
-									capture.hwnd2MatCont[i] = std::make_shared<Hwnd2Mat>(capture.hwndCont[items[i]]);
-									capture.WriterContainer[i]->start(already_captured_dir[i] + ".avi", capture.hwnd2MatCont[i], fps);
-								}
-								else {
-									alert_massage[i] = "This window is already captured!";
-								}
-							}
+							startButton(alert_massage[i], i);
+							//if (ImGui::Button("Start")) {
+							//	auto tmp = std::string(save_dir_char_ptr[i]);
+							//	if (items[i] == -1) {
+							//		alert_massage[i] = "You didn't Choose any window for capture";
+							//	}
+							//	else if (strlen(save_dir_char_ptr[i]) == 0) {
+							//		alert_massage[i] = "You didn't write name of save file";
+							//	}
+							//	else if (recording[i] == record) {
+							//		alert_massage[i] = "You already recording " + already_recording[i];
+
+							//	}
+							//	else if (recording[i] == pause) {
+							//		stopwatchCont[i].paused_end = std::chrono::steady_clock::now();
+							//		stopwatchCont[i].paused_summ += std::chrono::duration_cast<std::chrono::milliseconds>(stopwatchCont[i].paused_end - stopwatchCont[i].paused_begin);
+							//		capture.WriterContainer[i]->pause();
+							//		recording[i] = record;
+							//		alert_massage[i] = "Continue recording " + already_recording[i];
+							//	}
+							//	else if (find_str_in_strCont(tmp, already_captured_dir)) {
+							//		alert_massage[i] = "Can't record in the directory that already used";
+							//	}
+							//	else if (!find_str_in_strCont(capture.ObjNamesCont[items[i]], already_recording)) {
+							//		stopwatchCont[i].begin = stopwatchCont[i].end = std::chrono::steady_clock::now();
+							//		already_captured_dir[i] = std::string(save_dir_char_ptr[i]);
+							//		recording[i] = record;
+							//		alert_massage[i] = "Recording in progress";
+							//		already_recording[i] = capture.ObjNamesCont[items[i]];
+							//		//Start Capturing
+							//		capture.hwnd2MatCont[i] = std::make_shared<Hwnd2Mat>(capture.hwndCont[items[i]]);
+							//		capture.WriterContainer[i]->start(already_captured_dir[i] + ".avi", capture.hwnd2MatCont[i], fps);
+							//	}
+							//	else {
+							//		alert_massage[i] = "This window is already captured!";
+							//	}
+							//}
 							ImGui::SameLine();
-							if (ImGui::Button("Pause")) {
-								if (recording[i] == record) {
-									stopwatchCont[i].paused_begin = std::chrono::steady_clock::now();
-									recording[i] = pause;
-									alert_massage[i] = "Paused";
-									// Pause
-									capture.WriterContainer[i]->pause();
-								}
-								else if (recording[i] == pause) {
-									stopwatchCont[i].paused_end = std::chrono::steady_clock::now();
-									stopwatchCont[i].paused_summ += std::chrono::duration_cast<std::chrono::milliseconds>(stopwatchCont[i].paused_end - stopwatchCont[i].paused_begin);
-									recording[i] = record;
-									alert_massage[i] = "Continue recording " + already_recording[i];
-									// Unpause
-									capture.WriterContainer[i]->pause();
-								}
-								else {
-									alert_massage[i] = "Can't pause because you don't capture";
-								}
-							}
+							pauseButton(alert_massage, i);
+							//if (ImGui::Button("Pause")) {
+							//	if (recording[i] == record) {
+							//		stopwatchCont[i].paused_begin = std::chrono::steady_clock::now();
+							//		recording[i] = pause;
+							//		alert_massage[i] = "Paused";
+							//		// Pause
+							//		capture.WriterContainer[i]->pause();
+							//	}
+							//	else if (recording[i] == pause) {
+							//		stopwatchCont[i].paused_end = std::chrono::steady_clock::now();
+							//		stopwatchCont[i].paused_summ += std::chrono::duration_cast<std::chrono::milliseconds>(stopwatchCont[i].paused_end - stopwatchCont[i].paused_begin);
+							//		recording[i] = record;
+							//		alert_massage[i] = "Continue recording " + already_recording[i];
+							//		// Unpause
+							//		capture.WriterContainer[i]->pause();
+							//	}
+							//	else {
+							//		alert_massage[i] = "Can't pause because you don't capture";
+							//	}
+							//}
 							ImGui::SameLine();
-							if (ImGui::Button("Stop")) {
-								if (recording[i] == record || recording[i] == pause) {
-									recording[i] = stop;
-									already_recording[i] = "";
-									already_captured_dir[i] = "";
-									stopwatchCont[i].paused_summ = std::chrono::duration_cast<std::chrono::milliseconds>(stopwatchCont[i].paused_begin - stopwatchCont[i].paused_begin);;
-									alert_massage[i] = "Stoped";
-									// Stop
-									capture.WriterContainer[i]->stop();
-								}
-								else {
-									alert_massage[i] = "Can't stop because you don't capture";
-								}
-							}
+							stopButton(alert_massage, i);
+							//if (ImGui::Button("Stop")) {
+							//	if (recording[i] == record || recording[i] == pause) {
+							//		recording[i] = stop;
+							//		already_recording[i] = "";
+							//		already_captured_dir[i] = "";
+							//		stopwatchCont[i].paused_summ = std::chrono::duration_cast<std::chrono::milliseconds>(stopwatchCont[i].paused_begin - stopwatchCont[i].paused_begin);;
+							//		alert_massage[i] = "Stoped";
+							//		// Stop
+							//		capture.WriterContainer[i]->stop();
+							//	}
+							//	else {
+							//		alert_massage[i] = "Can't stop because you don't capture";
+							//	}
+							//}
 							ImGui::SameLine();
-							if (ImGui::Button("Show")) {
+							showButton(alert_massage, i);
+							/*if (ImGui::Button("Show")) {
 								if (recording[i] == record || recording[i] == pause) {
 									if (!show_draw[i]) {
 										show_draw[i] = true;
@@ -351,7 +362,7 @@ void Application::start()
 									alert_massage[i] = "Can't show because you don't capture";
 								}
 							}
-							stopwatchCont[i].end = std::chrono::steady_clock::now();
+							stopwatchCont[i].end = std::chrono::steady_clock::now();*/
 							ImGui::Text(alert_massage[i].c_str());
 						}
 						if ((recording[i] == record || recording[i] == pause) && show_draw[i]) {
@@ -389,3 +400,104 @@ void Application::start()
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }
+
+void Application::startButton(std::string& alert_massage, int i)
+{
+	if (ImGui::Button("Start")) {
+		auto tmp = std::string(save_dir_char_ptr[i]);
+		if (items[i] == -1) {
+			alert_massage = "You didn't Choose any window for capture";
+		}
+		else if (strlen(save_dir_char_ptr[i]) == 0) {
+			alert_massage = "You didn't write name of save file";
+		}
+		else if (recording[i] == record) {
+			alert_massage = "You already recording " + already_recording[i];
+
+		}
+		else if (recording[i] == pause) {
+			stopwatchCont[i].paused_end = std::chrono::steady_clock::now();
+			stopwatchCont[i].paused_summ += std::chrono::duration_cast<std::chrono::milliseconds>(stopwatchCont[i].paused_end - stopwatchCont[i].paused_begin);
+			capture.WriterContainer[i]->pause();
+			recording[i] = record;
+			alert_massage = "Continue recording " + already_recording[i];
+		}
+		else if (find_str_in_strCont(tmp, already_captured_dir)) {
+			alert_massage = "Can't record in the directory that already used";
+		}
+		else if (!find_str_in_strCont(capture.ObjNamesCont[items[i]], already_recording)) {
+			stopwatchCont[i].begin = stopwatchCont[i].end = std::chrono::steady_clock::now();
+			already_captured_dir[i] = std::string(save_dir_char_ptr[i]);
+			recording[i] = record;
+			alert_massage = "Recording in progress";
+			already_recording[i] = capture.ObjNamesCont[items[i]];
+			//Start Capturing
+			capture.hwnd2MatCont[i] = std::make_shared<Hwnd2Mat>(capture.hwndCont[items[i]]);
+			capture.WriterContainer[i]->start(already_captured_dir[i] + ".avi", capture.hwnd2MatCont[i], fps);
+		}
+		else {
+			alert_massage = "This window is already captured!";
+		}
+	}
+}
+
+void Application::pauseButton(std::vector<std::string>& alert_massage, int i)
+{
+	if (ImGui::Button("Pause")) {
+		if (recording[i] == record) {
+			stopwatchCont[i].paused_begin = std::chrono::steady_clock::now();
+			recording[i] = pause;
+			alert_massage[i] = "Paused";
+			// Pause
+			capture.WriterContainer[i]->pause();
+		}
+		else if (recording[i] == pause) {
+			stopwatchCont[i].paused_end = std::chrono::steady_clock::now();
+			stopwatchCont[i].paused_summ += std::chrono::duration_cast<std::chrono::milliseconds>(stopwatchCont[i].paused_end - stopwatchCont[i].paused_begin);
+			recording[i] = record;
+			alert_massage[i] = "Continue recording " + already_recording[i];
+			// Unpause
+			capture.WriterContainer[i]->pause();
+		}
+		else {
+			alert_massage[i] = "Can't pause because you don't capture";
+		}
+	}
+}
+
+void Application::stopButton(std::vector<std::string>& alert_massage, int i)
+{
+	if (ImGui::Button("Stop")) {
+		if (recording[i] == record || recording[i] == pause) {
+			recording[i] = stop;
+			already_recording[i] = "";
+			already_captured_dir[i] = "";
+			stopwatchCont[i].paused_summ = std::chrono::duration_cast<std::chrono::milliseconds>(stopwatchCont[i].paused_begin - stopwatchCont[i].paused_begin);;
+			alert_massage[i] = "Stoped";
+			// Stop
+			capture.WriterContainer[i]->stop();
+		}
+		else {
+			alert_massage[i] = "Can't stop because you don't capture";
+		}
+	}
+}
+
+void Application::showButton(std::vector<std::string>& alert_massage, int i)
+{
+	if (ImGui::Button("Show")) {
+		if (recording[i] == record || recording[i] == pause) {
+			if (!show_draw[i]) {
+				show_draw[i] = true;
+			}
+			else {
+				show_draw[i] = false;
+			}
+		}
+		else {
+			alert_massage[i] = "Can't show because you don't capture";
+		}
+	}
+	stopwatchCont[i].end = std::chrono::steady_clock::now();
+}
+
