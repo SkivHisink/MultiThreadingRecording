@@ -1,4 +1,7 @@
 #include <iostream>
+
+#include <opencv2/imgproc.hpp>
+
 #include "VideoWrite.hpp"
 
 #include "imgui/imgui.h"

@@ -2,10 +2,8 @@
 //std
 #include <atomic>
 //ImGui
-
 #include <glad/glad.h>
 //OpenCV
-#include <opencv2/imgproc.hpp>
 #include <opencv2/videoio.hpp>
 
 #include "Hwnd2Mat.hpp"
