@@ -76,10 +76,10 @@ class GUI
 	std::vector<recording_escort_cont> rec;
 	App_var_cont capture;
 	
-	void starterButton( int i);
-	void stopButton(int i);
-	void pauseButton(int i);
-	void showButton(int i);
+	void starterButton(size_t i);
+	void stopButton(size_t i);
+	void pauseButton(size_t i);
+	void showButton(size_t i);
 
 	bool find_str_in_strCont(std::string& str, str_num numb);
 	

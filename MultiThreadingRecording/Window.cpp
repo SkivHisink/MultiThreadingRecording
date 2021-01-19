@@ -89,7 +89,6 @@ bool Window::create()
 
 void Window::start_frame()
 {
-
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();

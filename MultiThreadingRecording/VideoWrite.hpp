@@ -21,14 +21,14 @@ class VideoWrite final: public ImGuiDrawable
 	std::atomic<bool> running = false;
 	std::atomic<bool> paused = false;
 	void run(std::string filename, std::shared_ptr<Hwnd2Mat> capDesktop);
-	int codec = cv::VideoWriter::fourcc('X', 'V', 'I', 'D');
+	int codec = cv::VideoWriter::fourcc('X', 'V', 'I', 'D'); //'L', 'A', 'G', 'S'
 	double fps = 30.0;
 	cv::Mat img;
 	GLuint texture;
 public:
 	// explicit
 	 VideoWrite() = default;
-	VideoWrite(VideoWrite&&) noexcept {}
+	//VideoWrite(VideoWrite&&) noexcept {}
 
 	// implicit
 	VideoWrite(const VideoWrite&) = delete;

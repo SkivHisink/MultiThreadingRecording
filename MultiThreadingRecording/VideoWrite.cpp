@@ -54,10 +54,7 @@ void VideoWrite::run(std::string filename, std::shared_ptr<Hwnd2Mat> capDesktop)
 		stop();
 		return;
 	}
-	int sleep_time = 1000 / fps;
-
 	while (running) {
-		Sleep(sleep_time);
 		if (!paused) {
 			capDesktop->read();
 			cvtColor(capDesktop->image, img, cv::COLOR_BGRA2BGR);

@@ -156,7 +156,7 @@ bool GUI::find_str_in_strCont(std::string& str, str_num numb)
 	return false;
 }
 
-void GUI::starterButton(int i)
+void GUI::starterButton(size_t i)
 {
 	if (ImGui::Button("Start")) {
 		std::string tmp = std::string(rec[i].save_dir);
@@ -195,7 +195,7 @@ void GUI::starterButton(int i)
 	}
 }
 
-void GUI::pauseButton(int i)
+void GUI::pauseButton(size_t i)
 {
 	if (ImGui::Button("Pause")) {
 		if (rec[i].recording == record) {
@@ -219,7 +219,7 @@ void GUI::pauseButton(int i)
 	}
 }
 
-void GUI::stopButton(int i)
+void GUI::stopButton(size_t i)
 {
 	if (ImGui::Button("Stop")) {
 		if (rec[i].recording == record || rec[i].recording == pause) {
@@ -237,7 +237,7 @@ void GUI::stopButton(int i)
 	}
 }
 
-void GUI::showButton(int i)
+void GUI::showButton(size_t i)
 {
 	if (ImGui::Button("Show")) {
 		if (rec[i].recording == record || rec[i].recording == pause) {
