@@ -15,6 +15,7 @@ public:
 	virtual ~ImGuiDrawable() = default;
 	virtual void draw(std::string& window_name) = 0;
 };
+
 class VideoWrite final: public ImGuiDrawable
 {
 	std::atomic<bool> running = false;

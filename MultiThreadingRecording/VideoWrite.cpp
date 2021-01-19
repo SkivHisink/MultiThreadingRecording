@@ -21,7 +21,7 @@ void VideoWrite::start(const std::string& filename, std::shared_ptr<Hwnd2Mat> ca
 	glGenTextures(1, &texture);
 
 	running = true;
-	std::thread([this, filename, &capDesktop]()
+	std::thread([this, filename, capDesktop]()
 		{
 			run(filename, capDesktop);
 		}).detach();
@@ -57,14 +57,13 @@ void VideoWrite::run(std::string filename, std::shared_ptr<Hwnd2Mat> capDesktop)
 	int sleep_time = 1000 / fps;
 
 	while (running) {
+		Sleep(sleep_time);
 		if (!paused) {
 			capDesktop->read();
 			cvtColor(capDesktop->image, img, cv::COLOR_BGRA2BGR);
 			writer << img;
 		}
-		Sleep(sleep_time);
-		if (!running)
-		{
+		if (!running) {
 			running = false;
 			break;
 		}
