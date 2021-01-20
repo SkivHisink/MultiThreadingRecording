@@ -75,14 +75,16 @@ class GUI
 	double fps = 30.0;
 	std::vector<recording_escort_cont> rec;
 	App_var_cont capture;
-	
-	void starterButton(size_t i);
+
+	void startButton(size_t i);
 	void stopButton(size_t i);
 	void pauseButton(size_t i);
 	void showButton(size_t i);
 
+	void checkStart(size_t i);
+
 	bool find_str_in_strCont(std::string& str, str_num numb);
-	
+
 
 public:
 	void init(size_t number_of_threads);

@@ -1,5 +1,7 @@
 #include "GUI.hpp"
 
+#include <iostream>
+
 std::string wideToMultiByte(std::wstring const& wideString)
 {
 	std::string ret;
@@ -60,7 +62,7 @@ bool updateWindows(App_var_cont& capture, std::vector<std::wstring>& titles)
 	if (titles.size() != capture.hwndCont.size()) {
 		capture.hwndCont.clear();
 		capture.ObjNamesCont.clear();
-		for (int i = 0; i < titles.size(); ++i) {
+		for (size_t i = 0; i < titles.size(); ++i) {
 			if (i == 0) {
 				capture.hwndCont.push_back(GetDesktopWindow());
 				capture.ObjNamesCont.push_back("Primary monitor");
@@ -90,7 +92,7 @@ void GUI::capturre_control(size_t i)
 	std::string id_input = "Input";
 
 	ImGui::TableNextColumn();
-	ImGui::Text("Capture %d", i + 1);
+	ImGui::Text("Capture %zu", i + 1);
 
 	ImGui::BeginChild((id_child + std::to_string(i)).c_str(), ImVec2(0, 170), true, ImGuiWindowFlags_None);
 	{
@@ -111,7 +113,8 @@ void GUI::capturre_control(size_t i)
 			rec[i].stopwatchCont.elapsed_ms.count() / 1000 % 60,
 			rec[i].stopwatchCont.elapsed_ms.count() % 1000);
 
-		starterButton(i);
+		startButton(i);
+		checkStart(i);
 		ImGui::SameLine();
 		pauseButton(i);
 		ImGui::SameLine();
@@ -156,7 +159,7 @@ bool GUI::find_str_in_strCont(std::string& str, str_num numb)
 	return false;
 }
 
-void GUI::starterButton(size_t i)
+void GUI::startButton(size_t i)
 {
 	if (ImGui::Button("Start")) {
 		std::string tmp = std::string(rec[i].save_dir);
@@ -195,6 +198,13 @@ void GUI::starterButton(size_t i)
 	}
 }
 
+void GUI::checkStart(size_t i)
+{
+	if (!capture.WriterContainer[i]->get_running() && rec[i].recording == record) {
+		rec[i].alert_massage = "Can't create or open file ";
+		rec[i].recording == false;
+	}
+}
 void GUI::pauseButton(size_t i)
 {
 	if (ImGui::Button("Pause")) {

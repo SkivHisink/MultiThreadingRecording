@@ -1,6 +1,4 @@
 #include "Application.hpp"
-//std
-#include <iostream>
 //ImGui components
 #include <GLFW/glfw3.h>
 #include "imgui/imgui_impl_glfw.h"
@@ -17,8 +15,17 @@ bool Application::init()
 	}
 	//Getting info about threads
 	number_of_threads = std::thread::hardware_concurrency();
-	if (number_of_threads == 0) { number_of_threads = 2; } 
+	if (number_of_threads == 0) { number_of_threads = 2; }
 
+	//Getting info about frequency of monitor
+	HDC hDCScreen = GetDC(NULL);
+	monitor_freq = GetDeviceCaps(hDCScreen, VREFRESH);
+	if (monitor_freq == 0)
+	{
+		monitor_freq = 60;
+	}
+	//ReleaseDC(NULL, hDCScreen);
+	
 	// Initialization all objects for capturing
 	gui.init(number_of_threads);
 
@@ -31,7 +38,7 @@ void Application::start()
 	// Main loop
 	while (!window_control.windowShouldClose()) {
 		glfwPollEvents();
-		Sleep(1000 / 60);
+		Sleep(1000 / monitor_freq);
 
 		// Start the Dear ImGui frame
 		window_control.start_frame();
@@ -54,7 +61,7 @@ void Application::start()
 bool Application::mainCWindow(bool& show_another_window)
 {
 	bool exit_flag = false;
-	ImGui::Begin("Capture Control Menu");
+	ImGui::Begin("Main Menu");
 	if (ImGui::Button("Start")) {
 		show_another_window = true;
 	}

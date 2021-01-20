@@ -16,19 +16,18 @@ public:
 	virtual void draw(std::string& window_name) = 0;
 };
 
-class VideoWrite final: public ImGuiDrawable
+class VideoWrite final : public ImGuiDrawable
 {
 	std::atomic<bool> running = false;
 	std::atomic<bool> paused = false;
 	void run(std::string filename, std::shared_ptr<Hwnd2Mat> capDesktop);
-	int codec = cv::VideoWriter::fourcc('X', 'V', 'I', 'D'); //'L', 'A', 'G', 'S'
+	int codec = cv::VideoWriter::fourcc('D', 'I', 'V', 'X');
 	double fps = 30.0;
 	cv::Mat img;
 	GLuint texture;
 public:
 	// explicit
-	 VideoWrite() = default;
-	//VideoWrite(VideoWrite&&) noexcept {}
+	VideoWrite() = default;
 
 	// implicit
 	VideoWrite(const VideoWrite&) = delete;
@@ -52,5 +51,6 @@ public:
 	void stop();
 	void pause();
 	void draw(std::string& window_name) override;
-	
+
+	bool get_running() const { return running; }
 };

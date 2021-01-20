@@ -5,6 +5,7 @@
 class Application final
 {
 	size_t number_of_threads = 0;
+	size_t monitor_freq = 0;
 	//UI
 	Window window_control;
 	GUI gui;

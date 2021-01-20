@@ -50,7 +50,6 @@ void VideoWrite::run(std::string filename, std::shared_ptr<Hwnd2Mat> capDesktop)
 		filename = filename.substr(0, 15) + filename.substr(filename.size() - 15);
 	}
 	if (!writer.open(filename, codec, fps, capDesktop->image.size(), true)) {
-		std::cout << "Can't create or open file " << filename << " for write with this parameters" << std::endl;
 		stop();
 		return;
 	}
