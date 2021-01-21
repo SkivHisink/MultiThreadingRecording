@@ -33,14 +33,7 @@ void VideoWrite::stop()
 }
 void VideoWrite::pause()
 {
-	if (paused)
-	{
-		paused = false;
-	}
-	else
-	{
-		paused = true;
-	}
+		paused = !paused;
 }
 
 void VideoWrite::run(std::string filename, std::shared_ptr<Hwnd2Mat> capDesktop)

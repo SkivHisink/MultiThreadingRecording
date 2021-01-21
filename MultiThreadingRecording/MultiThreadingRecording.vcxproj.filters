@@ -16,6 +16,9 @@
     <Filter Include="Header Files\imgui">
       <UniqueIdentifier>{4824c0ef-6116-4324-863b-79122300eaca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\GUI">
+      <UniqueIdentifier>{a81026df-678b-4a9b-ac8c-0f416efa166a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -105,7 +108,16 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GUI.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Time_struct.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Writing_state.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Capture_objects.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

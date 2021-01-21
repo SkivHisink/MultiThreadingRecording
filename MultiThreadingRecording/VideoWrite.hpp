@@ -31,7 +31,7 @@ public:
 
 	// implicit
 	VideoWrite(const VideoWrite&) = delete;
-	VideoWrite& operator=(const VideoWrite&) = delete;
+	VideoWrite& operator=(const VideoWrite&) {};
 
 	~VideoWrite()
 	{

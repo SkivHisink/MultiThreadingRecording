@@ -4,6 +4,8 @@
 
 #include <glad/glad.h>
 
+#include "MTRException.hpp"
+
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
@@ -12,12 +14,9 @@ static void glfw_error_callback(int error, const char* description)
 	fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
-bool Window::create()
+// Decide GL+GLSL versions
+const char* version_definition()
 {
-	// Setup window
-	glfwSetErrorCallback(glfw_error_callback);
-	if (!glfwInit()) { return false; }
-	// Decide GL+GLSL versions
 #ifdef __APPLE__
 	// GL 3.2 + GLSL 150
 	const char* glsl_version = "#version 150";
@@ -33,14 +32,12 @@ bool Window::create()
 	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
+	return glsl_version;
+}
 
-	// Create window with graphics context
-	window = glfwCreateWindow(1280, 720, "MultiThreading VideoCapture", NULL, NULL);
-	if (window == NULL) { return false; }
-	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1); // Enable vsync
-
-	// Initialize OpenGL loader
+// Initialize OpenGL loader
+bool loader_initialization()
+{
 #if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
 	bool err = gl3wInit() != 0;
 #elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
@@ -58,33 +55,47 @@ bool Window::create()
 #else
 	bool err = false; // If you use IMGUI_IMPL_OPENGL_LOADER_CUSTOM, your loader is likely to requires some form of initialization.
 #endif
-	if (err) {
-		fprintf(stderr, "Failed to initialize OpenGL loader!\n");
-		return false;
+	return err;
+}
+
+void Window::create()
+{
+	// Setup window
+	glfwSetErrorCallback(glfw_error_callback);
+	if (!glfwInit())
+	{
+		throw MTRException("Failed to initialize glfw!\n");
+	}
+	
+	std::string glsl_version = version_definition();
+	
+	// Create window with graphics context
+	window = glfwCreateWindow(1280, 720, "MultiThreading VideoCapture", NULL, NULL);
+	if (window == NULL)
+	{
+		throw MTRException("Failed to create window with graphics context!\n");
+	}
+	glfwMakeContextCurrent(window);
+	glfwSwapInterval(1); // Enable vsync
+
+	if (loader_initialization()) {
+		throw MTRException("Failed to initialize OpenGL loader!\n");
 	}
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	try {
-		io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Times.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesCyrillic());
-	}
-	catch (std::exception& e)
-	{
-		std::cout << e.what() << std::endl;
-	}
+	io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Times.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesCyrillic());
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
 	//ImGui::StyleColorsClassic();
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init(glsl_version);
-
+	ImGui_ImplOpenGL3_Init(glsl_version.c_str());
 
 	// Our state
 	clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	return true;
 }
 
 void Window::start_frame()

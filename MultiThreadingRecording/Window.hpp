@@ -8,7 +8,7 @@ class Window
 	GLFWwindow* window;
 	ImVec4 clear_color;
 public:
-	bool create();
+	void create();
 	void start_frame();
 	void rendering();
 	bool windowShouldClose();

@@ -9,10 +9,7 @@
 
 bool Application::init()
 {
-	if (!window_control.create())
-	{
-		return false;
-	}
+	window_control.create();
 	//Getting info about threads
 	number_of_threads = std::thread::hardware_concurrency();
 	if (number_of_threads == 0) { number_of_threads = 2; }
@@ -25,7 +22,7 @@ bool Application::init()
 		monitor_freq = 60;
 	}
 	//ReleaseDC(NULL, hDCScreen);
-	
+
 	// Initialization all objects for capturing
 	gui.init(number_of_threads);
 
@@ -98,7 +95,7 @@ void Application::secondCWindow()
 		ImGui::BeginChild("ChildR", ImVec2(0, 400), true, ImGuiWindowFlags_None);
 		if (ImGui::BeginTable("split", 1, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings)) {
 			for (size_t i = 0; i < threads_in_use; ++i) {
-				gui.capturre_control(i);
+				gui.capture_control(i);
 			}
 			ImGui::EndTable();
 		}

@@ -1,6 +1,5 @@
 #include "GUI.hpp"
-
-#include <iostream>
+#include "imgui/imgui.h"
 
 std::string wideToMultiByte(std::wstring const& wideString)
 {
@@ -9,7 +8,7 @@ std::string wideToMultiByte(std::wstring const& wideString)
 
 	for (wchar_t const& wc : wideString)
 	{
-		int mbCharLen = std::wctomb(&buff[0], wc);
+		int mbCharLen = std::wctomb(buff.data(), wc);
 
 		if (mbCharLen < 1) { break; }
 
@@ -22,19 +21,15 @@ std::string wideToMultiByte(std::wstring const& wideString)
 	return ret;
 }
 
-static auto vector_getter = [](void* vec, int idx, const char** out_text)
-{
-	auto& vector = *static_cast<std::vector<std::string>*>(vec);
-	if (idx < 0 || idx >= static_cast<int>(vector.size())) { return false; }
-	*out_text = vector.at(idx).c_str();
-	return true;
-};
-
 bool Combo(const char* label, int* currIndex, std::vector<std::string>& values)
 {
 	if (values.empty()) { return false; }
-	return ImGui::Combo(label, currIndex, vector_getter,
-		static_cast<void*>(&values), values.size());
+	return ImGui::Combo(label, currIndex, [](void* vec, int idx, const char** out_text) {
+		auto& vector = *static_cast<std::vector<std::string>*>(vec);
+		if (idx < 0 || idx >= static_cast<int>(vector.size())) { return false; }
+		*out_text = vector.at(idx).c_str();
+		return true;
+		}, static_cast<void*>(&values), static_cast<int>(values.size()));
 }
 
 BOOL CALLBACK getOpenWindowsNames(HWND hwnd, LPARAM lParam) {
@@ -57,7 +52,7 @@ BOOL CALLBACK getOpenWindowsNames(HWND hwnd, LPARAM lParam) {
 	return TRUE;
 }
 
-bool updateWindows(App_var_cont& capture, std::vector<std::wstring>& titles)
+bool updateWindows(Capture_objects& capture, std::vector<std::wstring>& titles)
 {
 	if (titles.size() != capture.hwndCont.size()) {
 		capture.hwndCont.clear();
@@ -76,7 +71,8 @@ bool updateWindows(App_var_cont& capture, std::vector<std::wstring>& titles)
 	}
 	return false;
 }
-void App_var_cont::init(size_t size, std::vector<std::wstring>& titles)
+
+void Capture_objects::init(size_t size, std::vector<std::wstring>& titles)
 {
 	updateWindows(*this, titles);
 	hwnd2MatCont.assign(size, nullptr);
@@ -85,7 +81,7 @@ void App_var_cont::init(size_t size, std::vector<std::wstring>& titles)
 	}
 }
 
-void GUI::capturre_control(size_t i)
+void GUI::capture_control(size_t i)
 {
 	std::string id_child = "ChildRCh";
 	std::string id_combo = "Combo";
@@ -135,7 +131,7 @@ void GUI::init(size_t number_of_threads)
 	EnumWindows(getOpenWindowsNames, reinterpret_cast<LPARAM>(&titles));
 	capture.init(number_of_threads, titles);
 	//UI var init
-	rec.assign(number_of_threads, recording_escort_cont());
+	rec.assign(number_of_threads, Writing_state());
 	for (size_t i = 0; i < number_of_threads; ++i)
 	{
 		rec[i].save_dir = new char[256];
@@ -202,9 +198,10 @@ void GUI::checkStart(size_t i)
 {
 	if (!capture.WriterContainer[i]->get_running() && rec[i].recording == record) {
 		rec[i].alert_massage = "Can't create or open file ";
-		rec[i].recording == false;
+		rec[i].recording = stop;
 	}
 }
+
 void GUI::pauseButton(size_t i)
 {
 	if (ImGui::Button("Pause")) {
