@@ -1,4 +1,6 @@
 #include "GUI.hpp"
+
+#include "imgui_mod.h"
 #include "imgui/imgui.h"
 
 std::string wideToMultiByte(std::wstring const& wideString)
@@ -19,17 +21,6 @@ std::string wideToMultiByte(std::wstring const& wideString)
 	}
 
 	return ret;
-}
-
-bool Combo(const char* label, int* currIndex, std::vector<std::string>& values)
-{
-	if (values.empty()) { return false; }
-	return ImGui::Combo(label, currIndex, [](void* vec, int idx, const char** out_text) {
-		auto& vector = *static_cast<std::vector<std::string>*>(vec);
-		if (idx < 0 || idx >= static_cast<int>(vector.size())) { return false; }
-		*out_text = vector.at(idx).c_str();
-		return true;
-		}, static_cast<void*>(&values), static_cast<int>(values.size()));
 }
 
 BOOL CALLBACK getOpenWindowsNames(HWND hwnd, LPARAM lParam) {
@@ -98,7 +89,7 @@ void GUI::capture_control(size_t i)
 		ImGui::PopID();
 		ImGui::Text("Choose window for Capture");
 		ImGui::PushID((id_combo + std::to_string(i)).c_str());
-		Combo("", &rec[i].items, capture.ObjNamesCont);
+		ImGuiMod::Combo("", &rec[i].items, capture.ObjNamesCont);
 		ImGui::PopID();
 		ImGui::SameLine();
 		rec[i].stopwatchCont.elapsed_ms = (rec[i].recording != record) ? rec[i].stopwatchCont.elapsed_ms :

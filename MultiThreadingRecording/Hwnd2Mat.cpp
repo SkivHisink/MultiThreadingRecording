@@ -1,7 +1,5 @@
 #include "Hwnd2Mat.hpp"
 
-#include <iostream>
-
 #include "MTRException.hpp"
 
 Hwnd2Mat::Hwnd2Mat(HWND hwindow, float scale)
@@ -11,12 +9,12 @@ Hwnd2Mat::Hwnd2Mat(HWND hwindow, float scale)
 	hwindowCompatibleDC = CreateCompatibleDC(hwindowDC);
 	SetStretchBltMode(hwindowCompatibleDC, COLORONCOLOR);
 	RECT windowsize;    // get the height and width of the screen
-	bool result = GetClientRect(hwnd, &windowsize);
+	const bool result = GetClientRect(hwnd, &windowsize);
 	if (result) {
 		srcheight = windowsize.bottom;
 		srcwidth = windowsize.right;
-		height = (int)(windowsize.bottom * scale);
-		width = (int)(windowsize.right * scale);
+		height = static_cast<int>(windowsize.bottom * scale);
+		width = static_cast<int>(windowsize.right * scale);
 		image.create(height, width, CV_8UC4);
 
 		// create a bitmap
@@ -37,8 +35,7 @@ Hwnd2Mat::Hwnd2Mat(HWND hwindow, float scale)
 		SelectObject(hwindowCompatibleDC, hbwindow);
 		read();
 	}
-	else
-	{
+	else {
 		throw MTRException("Can't capture window. Error:" + std::to_string(GetLastError()));
 	}
 };
@@ -46,7 +43,7 @@ Hwnd2Mat::Hwnd2Mat(HWND hwindow, float scale)
 void Hwnd2Mat::read()
 {
 	// copy from the window device context to the bitmap device context
-	StretchBlt(hwindowCompatibleDC, 0, 0, width, height, hwindowDC, 0, 0, srcwidth, srcheight, SRCCOPY); //change SRCCOPY to NOTSRCCOPY for wacky colors !
+	StretchBlt(hwindowCompatibleDC, 0, 0, width, height, hwindowDC, 0, 0, srcwidth, srcheight, SRCCOPY); //you can change SRCCOPY to NOTSRCCOPY for wacky colors !
 	GetDIBits(hwindowCompatibleDC, hbwindow, 0, height, image.data, (BITMAPINFO*)&bi, DIB_RGB_COLORS);  //copy from hwindowCompatibleDC to hbwindow
 };
 

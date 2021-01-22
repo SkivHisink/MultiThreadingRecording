@@ -19,6 +19,9 @@
     <Filter Include="Header Files\GUI">
       <UniqueIdentifier>{a81026df-678b-4a9b-ac8c-0f416efa166a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\imgui_mod">
+      <UniqueIdentifier>{de478d9c-f936-43c6-9f24-80ac213b6d88}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -65,6 +68,9 @@
     </ClCompile>
     <ClCompile Include="GUI.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_mod.cpp">
+      <Filter>Header Files\imgui_mod</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +124,12 @@
     </ClInclude>
     <ClInclude Include="Capture_objects.h">
       <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_mod.h">
+      <Filter>Header Files\imgui_mod</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGuiDrawable.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

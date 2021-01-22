@@ -4,7 +4,7 @@
 #include "imgui/imgui_impl_glfw.h"
 //OpenCV
 #include <opencv2/highgui.hpp>
-
+//hwnd to mat transformator
 #include "Hwnd2Mat.hpp"
 
 bool Application::init()
@@ -21,7 +21,7 @@ bool Application::init()
 	{
 		monitor_freq = 60;
 	}
-	//ReleaseDC(NULL, hDCScreen);
+	ReleaseDC(NULL, hDCScreen);
 
 	// Initialization all objects for capturing
 	gui.init(number_of_threads);
@@ -75,11 +75,9 @@ void Application::secondCWindow()
 	static int threads_in_use = 1;
 	if (number_of_threads == 2) {
 		ImGui::Text("Unable to properly define or calculate the number of threads on your device. The number of threads that you can use, set to 2.");
-
 	}
 	else {
 		ImGui::Text("Choose how much windows you want to capture. You can capture no more than %zu.", number_of_threads);
-
 		ImGui::InputInt("Number of threads", &threads_in_use, 1, 0);
 		if (threads_in_use > number_of_threads || threads_in_use <= 0) {
 			threads_in_use = 1;
@@ -88,9 +86,6 @@ void Application::secondCWindow()
 	ImGui::Text("Choose %d progs, which you want to capture", threads_in_use);
 	// Child
 	{
-		////titles.clear();
-		////EnumWindows(getOpenWindowsNames, reinterpret_cast<LPARAM>(&titles));
-		////updateWindows(capture, titles);
 		ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
 		ImGui::BeginChild("ChildR", ImVec2(0, 400), true, ImGuiWindowFlags_None);
 		if (ImGui::BeginTable("split", 1, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings)) {

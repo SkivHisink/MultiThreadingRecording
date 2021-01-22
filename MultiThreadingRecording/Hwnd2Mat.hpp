@@ -8,12 +8,13 @@ public:
 	Hwnd2Mat(HWND hwindow, float scale = 1);
 	~Hwnd2Mat();
 	void read();
-	cv::Mat image;
+	cv::Mat getMat() { return image; }
 
 private:
 	HWND hwnd;
 	HDC hwindowDC, hwindowCompatibleDC;
 	int height, width, srcheight, srcwidth;
 	HBITMAP hbwindow;
-	BITMAPINFOHEADER  bi;
+	BITMAPINFOHEADER  bi{};
+	cv::Mat image;
 };

@@ -1,9 +1,6 @@
 #pragma once
-//#include "imgui/imgui.h"
 #include "Capture_objects.h"
 #include "Writing_state.h"
-
-
 
 class GUI
 {
@@ -21,8 +18,6 @@ class GUI
 	void checkStart(size_t i);
 
 	bool find_str_in_strCont(std::string& str, str_num numb);
-
-
 public:
 	void init(size_t number_of_threads);
 	void capture_control(size_t i);
