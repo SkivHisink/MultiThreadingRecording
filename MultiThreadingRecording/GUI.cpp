@@ -190,6 +190,8 @@ void GUI::checkStart(size_t i)
 	if (!capture.WriterContainer[i]->get_running() && rec[i].recording == record) {
 		rec[i].alert_massage = "Can't create or open file ";
 		rec[i].recording = stop;
+		rec[i].already_captured_dir = "";
+		rec[i].already_recording = "";
 	}
 }
 

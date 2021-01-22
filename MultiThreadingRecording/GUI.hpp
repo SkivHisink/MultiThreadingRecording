@@ -2,7 +2,7 @@
 #include "Capture_objects.h"
 #include "Writing_state.h"
 
-class GUI
+class GUI final
 {
 	// we use std::wstring in place of std::string. This is necessary so that the entire character set can be represented.
 	std::vector<std::wstring> titles;

@@ -3,7 +3,7 @@
 
 #include "imgui/imgui.h"
 
-class Window
+class Window final
 {
 	GLFWwindow* window;
 	ImVec4 clear_color;
