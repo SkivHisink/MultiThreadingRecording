@@ -91,7 +91,7 @@ void VideoWrite::draw(std::string& window_name)
 VideoWrite::~VideoWrite()
 {
 	running = false;
-	Sleep(10);
+	Sleep(50);
 }
 
 bool VideoWrite::setFPS(double fps_)
